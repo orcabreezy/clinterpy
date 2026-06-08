@@ -1,0 +1,2 @@
+[console_scripts]
+clinterpy = clinterpy.cli:main

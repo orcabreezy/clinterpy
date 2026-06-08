@@ -1,0 +1,15 @@
+LICENSE
+README.md
+pyproject.toml
+src/clinterpy/__init__.py
+src/clinterpy/cli.py
+src/clinterpy.egg-info/PKG-INFO
+src/clinterpy.egg-info/SOURCES.txt
+src/clinterpy.egg-info/dependency_links.txt
+src/clinterpy.egg-info/entry_points.txt
+src/clinterpy.egg-info/top_level.txt
+src/clinterpy/menu/__init__.py
+src/clinterpy/menu/async_menu.py
+src/clinterpy/menu/base_menu.py
+src/clinterpy/menu/menu.py
+tests/test_cli.py
