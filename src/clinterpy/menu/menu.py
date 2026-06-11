@@ -4,26 +4,25 @@ from clinterpy.menu.base_menu import BaseMenu
 
 
 class Menu(BaseMenu):
-    def display(self) -> None:
+    def display(self, parent_path: str = "") -> None:
         self.output: str = self.initial_output
 
         while True:
-            print(self._render_menu())
+            print(self._render_menu(parent_path))
             cmd = input(self.prompt)
             if cmd == "q":
                 break
             try:
                 action = self.actions[cmd]
                 if isinstance(action, Menu):
-                    action._set_path(self.path)
-                    action.display()
+                    action.display(self.path)
                     continue
 
+                # replace with callable()
                 if isinstance(action, Callable):
                     result = action()
                     if isinstance(result, Menu):
-                        result._set_path(self.path)
-                        result.display()
+                        result.display(self.path)
 
                     elif isinstance(result, str):
                         self.output = result
@@ -35,5 +34,6 @@ class Menu(BaseMenu):
                     break
                 # TODO M: Error on Async Menu
 
+            # TODO finer error or do not crash but use text-error message
             except KeyError:
                 self.output = f"'{cmd}' does not specify an action"

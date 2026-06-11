@@ -1,0 +1,54 @@
+class AsyncMenu(BaseMenu):
+    async def loop(self) -> None:
+        while True:
+            await async_print(self._render_menu())
+            cmd = await async_input(self.prompt)
+            if cmd == "q":
+                break
+
+            if len(cmd) > 1 and cmd[1] == ":":
+                # TODO: refine case
+                try:
+                    parts = cmd.split(":")
+                    action = self.actions[parts[0]]
+                    argument = parts[1]
+
+                    result = (
+                        await action(argument)
+                        if inspect.iscoroutinefunction(action)
+                        else action(argument)
+                    )
+                    if isinstance(result, str):
+                        self.output = result
+
+                    if self.is_single:
+                        break
+                except KeyError, TypeError:
+                    self.output = f"error on running parameterized action {cmd}"
+
+            else:
+                try:
+                    action = self.actions[cmd]
+                    # TODO: async processing indicator
+                    result = (
+                        await action()
+                        if inspect.iscoroutinefunction(action)
+                        else action()
+                    )
+
+                    if isinstance(result, AsyncMenu):
+                        result._set_path(self.path)
+                        await result.loop()
+
+                    if isinstance(result, Menu):
+                        result._set_path(self.path)
+                        result.loop()
+
+                    elif isinstance(result, str):
+                        self.output = result
+
+                    if self.is_single:
+                        break
+
+                except KeyError:
+                    self.output = f"'{cmd}' does not specify an action"

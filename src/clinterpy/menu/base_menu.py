@@ -12,17 +12,18 @@ class BaseMenu(ABC):
         actions: dict[str, Callable[[], str | Self] | Self],
         loop: bool = True,
         initial_output: str = "",
-        action_string: list[str] = [],
+        # TODO mutable default argument
+        action_string: list[str] | None = None,
     ):
         self.loop: bool = loop
         self.initial_output: str = initial_output
         self.actions: dict[str, Callable[[], str | Self] | Self] = {
             s[0]: actions[s] for s in actions
         }
-        # TODO auto-collision detection
+        # TODO auto-collision detection, quit collision detection
         self.prompt: str = (
             ("(q)uit, " + ", ".join(f"({s[0]}){s[1:]}" for s in actions) + ": ")
-            if action_string == []
+            if action_string is None
             else "(q)uit, "
             + ", ".join(f"({s[0]}){s[1:]}" for s in action_string)
             + ": "
@@ -30,16 +31,14 @@ class BaseMenu(ABC):
         self.path: str = name
         self.output: str = self.initial_output
 
-    def _set_path(self, path: str):
-        self.path = path + " > " + self.path
-
-    # TODO optionify
-    def _render_menu(self) -> str:
+    # TODO optionify (bad when nested :()
+    # - inject from above? when not specified otherwise
+    def _render_menu(self, parent_path: str) -> str:
         utils.clear_screen()
-        screen = "-" * 8 + "\n"
+        screen: str = "-" * 8 + "\n"
         screen += self.output + "\n"
         screen += ("-" * 8) + "\n"
-        screen += self.path + "\n"
+        screen += (parent_path + " > " if parent_path else "") + self.path + "\n"
 
         self.output = ""
 
